@@ -33,10 +33,10 @@ http.createServer(app).listen(app.get('port'), function(){
 });
 
 var connection = mysql.createConnection({
-	host: '8bitbiker.com',
-	user: 'bitbiker_edwin',
-	password: '$andsluv119',
-	database: 'bitbiker_1q84'
+	host: '',
+	user: '',
+	password: '',
+	database: ''
 });
 
 connection.connect();
