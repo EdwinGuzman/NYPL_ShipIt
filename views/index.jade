@@ -10,4 +10,5 @@ block content
 			#infobox.infobox
 			#map To get this app to work you need to share your geolocation
 
-		include locations
+		each l in location
+			.locations(data-name="#{l['name']}", data-lat="#{l['latitude']}", data-long="#{l['longitude']}")

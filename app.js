@@ -5,6 +5,7 @@
 
 var express = require('express'),
 		routes = require('./routes'),
+    nypl_locations = require('./routes/nypl_locations'),
 		user = require('./routes/user'),
 		http = require('http'),
 		path = require('path'),
@@ -52,10 +53,10 @@ var locations_filter=[];
 http.get(url, function(res) {
     //var body = '';
 
-    res.on('data', function(chunk) {
+    res.on('data', function(data) {
         //body += chunk;
-        //console.log(JSON.parse(chunk)[0]);
-        locations = JSON.parse(chunk);
+        // console.log(JSON.parse(data));
+        locations = JSON.parse( data );
         //console.log(typeof locations[0]['name']);
     });
 
@@ -74,19 +75,19 @@ io.sockets.on('connection', function (socket) {
 
     for (var i=0, len=locations.length; i < len; i++) {
       // console.log(locations[i]);
-      if (distance(user_location['lat'], user_location['long'], locations[i]['latitude'], locations[i]['longitude']) <= 3) {
+      if (distance(user_location['lat'], user_location['long'], locations[i]['latitude'], locations[i]['longitude']) <= 10) {
         //console.log(locations[i]['name']);
         locations_filter.push(locations[i]);
       }
     }
-    console.log(locations_filter);
-    //socket.broadcast.emit('load:coords', locations[0]);
+    //console.log(locations_filter);
+    socket.broadcast.emit('updateMap', locations_filter);
+    io.sockets.emit('updateMap', locations_filter);
   });
   // socket.on('map', function(data) {
   //   io.sockets.emit('updateMap', locations);
   // });
 
-  //io.sockets.emit('updateMap', locations);
 });
 
 function distance(lat1, lon1, lat2, lon2) {
@@ -107,27 +108,20 @@ function deg2rad(deg) {
   return deg * (Math.PI/180)
 }
 
-// delete to see more logs from sockets
 io.set('log level', 1);
 
-// var port = 8080;
-// app.listen(port);
-// console.log("localhost");
-
-
+// app.get('/', function(req, res) {
+//   for (var i=0, len=locations.length; i < len; i++) {
+//     //console.log(locations[i]['name']);
+//   }
+// 	res.render('index', { 
+//     title: 'NYPL Libraries', 
+//     location: locations_filter
+// 	});
+// });
 app.get('/', function(req, res) {
-  for (var i=0, len=locations.length; i < len; i++) {
-    //console.log(locations[i]['name']);
-  }
-	res.render('index', { 
-    title: 'NYPL Libraries', 
+  res.render('index', {
+    title: 'NYPL Libraries',  
     location: locations_filter
-	});
-});
-app.get('/', function(req, res) {
-  setTimeout(function(){ 
-    res.render('locations', {  
-      location: locations_filter
-    });
-  }, 3000);
+  });
 });

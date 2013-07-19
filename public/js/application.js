@@ -27,9 +27,18 @@ $(function() {
 	var markers = {};
 	var active = false;
 	// socket.emit('map', 'test');
-	// socket.on('updatemap', function(data) {
-	// 	alert(data);
-	// });
+	socket.on('updatemap', function(data) {
+		for (var i in data) {
+			console.log(data[i]);
+		}
+		// var libraries = $(".locations");
+
+		// libraries.each(function() {
+		// 	var marker = L.marker([$(this).data('lat'), $(this).data('long')], { icon: yellowIcon }).addTo(map);
+		// 	marker.bindPopup('<p>' + $(this).data('name') + '</p>');
+		// 	marker.addTo(map);
+		// });
+	});
 
 	// socket.on('load:coords', function(data) {
 	// 	alert(data);
@@ -88,13 +97,13 @@ $(function() {
 			//}
 		//});
 
-		var libraries = $(".locations");
+		// var libraries = $(".locations");
 
-		libraries.each(function() {
-			var marker = L.marker([$(this).data('lat'), $(this).data('long')], { icon: yellowIcon }).addTo(map);
-			marker.bindPopup('<p>' + $(this).data('name') + '</p>');
-			marker.addTo(map);
-		});
+		// libraries.each(function() {
+		// 	var marker = L.marker([$(this).data('lat'), $(this).data('long')], { icon: yellowIcon }).addTo(map);
+		// 	marker.bindPopup('<p>' + $(this).data('name') + '</p>');
+		// 	marker.addTo(map);
+		// });
 
 		socket.emit('send:coords', sentData);
 	}
