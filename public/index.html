@@ -5,8 +5,8 @@
 	<title>The New York Public Library</title>
 	<link rel="icon" type="image/png" href="/assets/favicon.ico">
 	<link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="./css/styles.css">
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+	<link rel="stylesheet" href="./css/styles.css">
 	<link rel="stylesheet" href="./css/MarkerCluster.css">
 	<link rel="stylesheet" href="./css/MarkerCluster.Default.css">
 
@@ -360,11 +360,55 @@
 						<div id="infobox" class="infobox"></div>
 						<div id="map">To get this app to work you need to share your geolocation.</div>
 					</div>
+					<div id="miles_form">
+						<input type="text" name="miles" placeholder="Distance in miles" id="miles"/>
+						<input type="button" name="submit" value="Submit" id="submit_miles"/>
+					</div>
+					<div id="library_directions"></div>
+					<div id="library_events">
+						<h2>Events</h2>
+						<table >
+	 
+					  <tbody>
+					    <tr class="">
+								<th class="calendar-date" colspan="2">Today</th>
+								</tr>
+								<tr class="odd views-row-first col-4">
+								<td class="views-field views-field-field_date_time_value">2 p.m.</td>
+								<td class="views-field views-field-title"><a href="http://nypl.org/locations/tid/871/node/219587?lref=871%2Fcalendar">Birds of Prey</a></td>
+								</tr>
+								<tr class="even col-4">
+								<th class="calendar-date" colspan="2">Monday, July 22, 2013</th>
+								</tr>
+								<tr class="even col-4">
+								<td class="views-field views-field-field_date_time_value">6:30 p.m.</td>
+								<td class="views-field views-field-title"><a href="http://nypl.org/locations/tid/871/node/217320?lref=871%2Fcalendar">Yoga</a></td>
+								</tr>
+								<tr class="odd col-4">
+								<th class="calendar-date" colspan="2">Tuesday, July 23, 2013</th>
+								</tr>
+								<tr class="odd col-4">
+								<td class="views-field views-field-field_date_time_value">1 p.m.</td>
+								<td class="views-field views-field-title"><a href="http://nypl.org/locations/tid/871/node/219846?lref=871%2Fcalendar">Resume Writing Seminar: What you need to know to give your resume the right direction</a></td>
+								</tr>
+								<tr class="even col-4">
+								<th class="calendar-date" colspan="2">Thursday, July 25, 2013</th>
+								</tr>
+								<tr class="even col-4">
+								<td class="views-field views-field-field_date_time_value">11 a.m.</td>
+								<td class="views-field views-field-title"><a href="http://nypl.org/locations/tid/871/node/218758?lref=871%2Fcalendar">Toddler Time</a></td>
+								</tr>
+								<tr class="odd views-row-last col-4">
+								<td class="views-field views-field-field_date_time_value">3 p.m.</td>
+								<td class="views-field views-field-title"><a href="http://nypl.org/locations/tid/871/node/219590?lref=871%2Fcalendar">Summer Read &amp; Snack Time</a></td>
+								</tr>
 
-					<input type="text" name="miles" placeholder="Distance in miles" id="miles"/>
-					<input type="button" name="submit" value="Submit" id="submit_miles"/>
-						<div id="library_directions"></div>
-						<div id="library_events"></div>
+					  </tbody>
+
+
+						</table>
+					</div>
+
 				</li>
 			</ul>
 

@@ -1089,10 +1089,36 @@ body {
       bottom: 10px;
       right: 10px; }
 
+
+#miles_form {
+  padding: 10px;
+}
+#miles {
+  height: 30px;
+  border: 1px solid #7d7872;
+  padding-left: 10px;
+}
+#submit_miles:hover {
+  background: #9b958f;
+  -moz-transition: all 0.1s ease-in-out;
+  -o-transition: all 0.1s ease-in-out;
+  -webkit-transition: all 0.1s ease-in-out;
+  -ms-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out; }
+
+#submit_miles {
+  color: white;
+  height: 30px;
+  width: 100px;
+  background: #7d7872;
+}
+
+
+
 footer {
   zoom: 1;
   clear: both;
-  margin-top: 400px;
+  margin-top: 700px;
   padding-top: 20px;
   padding-bottom: 120px;
   background: #7d7972;

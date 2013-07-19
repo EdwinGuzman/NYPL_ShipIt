@@ -41,10 +41,10 @@ $(function() {
 	socket.on('load:library_directions', function(data) {
 		console.log(data);
 		var libdir = $('#library_directions').html('');
-		var libevt = $('#library_events').html('');
+		//var libevt = $('#library_events').html('');
 		var dir = '<h2>Directions</h2>';
-		var evt = '<h2>Events</h2>';
-		
+		//var evt = '<h2>Events</h2>';
+
 		for (var i in data) {
 			dir += '<p><em>Mode:</em> ' + data[i]['mode'] + '<br />';
 			dir += 'Transit: ' + data[i]['identifier'] + '<br />';
@@ -52,7 +52,8 @@ $(function() {
 		}
 		
 		libdir.append(dir);
-		libevt.append(evt);
+		//libevt.append(evt);
+		$('#library_events').show();
 	});
 	var nyplLibraries = L.layerGroup();
 	socket.on('load:coords', function(data) {
@@ -64,7 +65,8 @@ $(function() {
 			var marker = L.marker([data[i]['latitude'], data[i]['longitude']], { icon: nyplIcon });
 			all_markers.push(marker);
 			var link = $('<p><a href="#" class="library_loc" id="'+ data[i]['sid'] + '">' + data[i]['name'] + '</a><br/ >' + data[i]['address'] + '</p>')
-				.click(function() {
+				.click(function(e) {
+					e.preventDefault();
 					console.log($(this).find('a').attr('id'));
 					socket.emit('send:sid', $(this).find('a').attr('id'));
 				})[0];
@@ -98,7 +100,7 @@ $(function() {
 		map = L.map('map').setView([lat, lng], 13);
 
 		// leaflet API key tiler
-		L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', { maxZoom: 13, detectRetina: true }).addTo(map);
+		L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', { maxZoom: 18, detectRetina: true }).addTo(map);
 		userMarker.addTo(map);
 		userMarker.bindPopup('<p>You are here!</p>').openPopup();
 
