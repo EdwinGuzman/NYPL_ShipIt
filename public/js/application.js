@@ -18,35 +18,62 @@ $(function() {
 			popupAnchor: [0, -30]
 		}
 	});
+	var nypl = L.Icon.extend({
+		options: {
+			iconSize: [20, 20]
+		}
+	});
 	var redIcon = new tinyIcon({ iconUrl: '../assets/marker-red.png' });
 	var yellowIcon = new tinyIcon({ iconUrl: '../assets/marker-yellow.png' });
+	var nyplIcon = new nypl({ iconUrl: '../assets/favicon.ico' });
 
 	var sentData = {};
 
 	var connects = {};
 	var markers = {};
+	var all_markers = [];
 	var active = false;
-	// socket.emit('map', 'test');
-	socket.on('updatemap', function(data) {
-		for (var i in data) {
-			console.log(data[i]);
-		}
-		// var libraries = $(".locations");
 
-		// libraries.each(function() {
-		// 	var marker = L.marker([$(this).data('lat'), $(this).data('long')], { icon: yellowIcon }).addTo(map);
-		// 	marker.bindPopup('<p>' + $(this).data('name') + '</p>');
-		// 	marker.addTo(map);
-		// });
+	socket.on('updatemap', function(data) {
+		alert(data);
 	});
 
-	// socket.on('load:coords', function(data) {
-	// 	alert(data);
+	socket.on('load:library_directions', function(data) {
+		console.log(data);
+		var libdir = $('#library_directions').html('');
+		var libevt = $('#library_events').html('');
+		var dir = '<h2>Directions</h2>';
+		var evt = '<h2>Events</h2>';
 		
+		for (var i in data) {
+			dir += '<p><em>Mode:</em> ' + data[i]['mode'] + '<br />';
+			dir += 'Transit: ' + data[i]['identifier'] + '<br />';
+			dir += 'Route: ' + data[i]['route'] + '</p><br />';
+		}
+		
+		libdir.append(dir);
+		libevt.append(evt);
+	});
+	var nyplLibraries = L.layerGroup();
+	socket.on('load:coords', function(data) {
+		nyplLibraries.clearLayers();
+		console.log(data);
 
-	// 	connects[data.id] = data;
-	// 		connects[data.id].updated = $.now(); // shothand for (new Date).getTime()
-	// });
+		all_markers.splice(0, all_markers.length);
+		for (var i in data) {
+			var marker = L.marker([data[i]['latitude'], data[i]['longitude']], { icon: nyplIcon });
+			all_markers.push(marker);
+			var link = $('<p><a href="#" class="library_loc" id="'+ data[i]['sid'] + '">' + data[i]['name'] + '</a><br/ >' + data[i]['address'] + '</p>')
+				.click(function() {
+					console.log($(this).find('a').attr('id'));
+					socket.emit('send:sid', $(this).find('a').attr('id'));
+				})[0];
+			marker.bindPopup(link);
+		}
+		nyplLibraries = L.layerGroup(all_markers);
+		map.addLayer(nyplLibraries);
+	});
+
 
 	// check whether browser supports geolocation api
 	if (navigator.geolocation) {
@@ -68,20 +95,12 @@ $(function() {
 		// userMarker = L.marker([51.45, 30.050], { icon: redIcon });
 
 		// load leaflet map
-		map = L.map('map').setView([40.784701, -73.941078], 12);
+		map = L.map('map').setView([lat, lng], 13);
 
 		// leaflet API key tiler
-		L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', { maxZoom: 18, detectRetina: true }).addTo(map);
-
-		// set map bounds
-		//map.fitWorld();
+		L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', { maxZoom: 13, detectRetina: true }).addTo(map);
 		userMarker.addTo(map);
-		userMarker.bindPopup('<p>You are there! Your ID is ' + userId + '</p>').openPopup();
-
-		//var emit = $.now();
-		// send coords on when user is active
-		//doc.on('mousemove', function() {
-			//active = true;
+		userMarker.bindPopup('<p>You are here!</p>').openPopup();
 
 		sentData = {
 			coords: {
@@ -91,27 +110,15 @@ $(function() {
 			}
 		};
 
-			//if ($.now() - emit > 30) {
-				//socket.emit('send:coords', sentData);
-				//emit = $.now();
-			//}
-		//});
-
-		// var libraries = $(".locations");
-
-		// libraries.each(function() {
-		// 	var marker = L.marker([$(this).data('lat'), $(this).data('long')], { icon: yellowIcon }).addTo(map);
-		// 	marker.bindPopup('<p>' + $(this).data('name') + '</p>');
-		// 	marker.addTo(map);
-		// });
 
 		socket.emit('send:coords', sentData);
 	}
 
-	doc.bind('mouseup mouseleave', function() {
-		active = false;
-	});
+	$('#submit_miles').click(function() {
 
+		var miles = parseInt($("#miles").val(), 10);
+		socket.emit('send:miles', miles);
+	});
 	// showing markers for connections
 	function setMarker(data) {
 		// for (var i = 0; i < data.coords.length; i++) {
@@ -141,14 +148,4 @@ $(function() {
 			info.removeClass('error');
 		});
 	}
-
-	// delete inactive users every 15 sec
-	setInterval(function() {
-		for (var ident in connects){
-			if ($.now() - connects[ident].updated > 15000) {
-				delete connects[ident];
-				map.removeLayer(markers[ident]);
-			}
-		}
-	}, 15000);
 });

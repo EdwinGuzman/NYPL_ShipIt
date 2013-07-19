@@ -1,94 +1,88 @@
+var http = require('http');
+var Static = require('node-static');
+var app = http.createServer(handler);
+var io = require('socket.io').listen(app);
+var port = 3000;
 
-/**
- * Module dependencies.
- */
+var files = new Static.Server('./public');
 
-var express = require('express'),
-		routes = require('./routes'),
-    nypl_locations = require('./routes/nypl_locations'),
-		user = require('./routes/user'),
-		http = require('http'),
-		path = require('path'),
-    //app = http.createServer(),
-    app = express(),
-    server = http.createServer(app),
-		mysql = require('mysql'),
-    io = require('socket.io').listen(server),
-    Static = require('node-static');
-
-// all environments
-app.set('port', process.env.PORT || 3000);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
-app.use(express.favicon());
-app.use(express.logger('dev'));
-app.use(express.bodyParser());
-app.use(express.methodOverride());
-app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
-
-//development only
-if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+function handler (request, response) {
+  request.on('end', function() {
+    files.serve(request, response);
+  }).resume();
 }
-// http.createServer(app).listen(app.get('port'), function(){
-server.listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-});
 
+// start app on specified port
+app.listen(port);
+console.log('Your server goes on localhost:' + port);
 
-
-// var files = new Static.Server('./public');
-
-// function handler(req, res) {
-//   req.on('end', function() {
-//     files.serve(req, res);
-//   }).resume();
-// }
-
-var url = 'http://localhost:8766/location/node-test';
+var url = 'http://localhost:8766/location/libraries_loc';
 var locations;
 var locations_filter=[];
 
 http.get(url, function(res) {
-    //var body = '';
+  var data = '';
 
-    res.on('data', function(data) {
-        //body += chunk;
-        // console.log(JSON.parse(data));
-        locations = JSON.parse( data );
-        //console.log(typeof locations[0]['name']);
-    });
+  res.on('data', function(chunk) {
+    data += chunk;
+  });
 
-    res.on('end', function() {
-        // var fbResponse = JSON.parse(body)
-        // console.log("Got response: ", fbResponse.name);
-    });
+  res.on('end', function() {
+    locations = JSON.parse(data);
+  });
 }).on('error', function(e) {
-      console.log("Got error: ", e);
+  console.log("Got error: ", e);
 });
+
+// delete to see more logs from sockets
+io.set('log level', 1);
+
 var user_location = {};
+var library_directions;
 io.sockets.on('connection', function (socket) {
+  console.log('connect!');
   socket.on('send:coords', function (data) {
     user_location['lat'] = data.coords.lat;
-    user_location['long'] = data.coords.lng;
+      user_location['long'] = data.coords.lng;
 
-    for (var i=0, len=locations.length; i < len; i++) {
-      // console.log(locations[i]);
-      if (distance(user_location['lat'], user_location['long'], locations[i]['latitude'], locations[i]['longitude']) <= 10) {
+      setLibraries(1);
+
+    socket.emit('load:coords', locations_filter);
+  });
+  socket.on('send:miles', function (data) {
+    //console.log(data);
+    setLibraries(data);
+    socket.emit('load:coords', locations_filter);
+  });
+  socket.on('send:sid', function (data) {
+    var url = 'http://localhost:8766/location/libraries_directions?sid=' + data;
+
+    http.get(url, function(res) {
+      var data = '';
+      res.on('data', function(chunk) {
+        data += chunk;
+      });
+
+      res.on('end', function() {
+        library_directions = JSON.parse(data);
+        socket.emit('load:library_directions', library_directions);
+      });
+    }).on('error', function(e) {
+        console.log("Got error: ", e);
+    });
+    socket.emit('load:library_directions', library_directions);
+  });
+});
+
+function setLibraries(miles) {
+  locations_filter = [];
+  for (var i=0, len=locations.length; i < len; i++) {
+      if (distance(user_location['lat'], user_location['long'], locations[i]['latitude'], locations[i]['longitude']) <= miles) {
         //console.log(locations[i]['name']);
         locations_filter.push(locations[i]);
       }
     }
-    //console.log(locations_filter);
-    socket.broadcast.emit('updateMap', locations_filter);
-    io.sockets.emit('updateMap', locations_filter);
-  });
-  // socket.on('map', function(data) {
-  //   io.sockets.emit('updateMap', locations);
-  // });
-
-});
+}
 
 function distance(lat1, lon1, lat2, lon2) {
   var R = 6371; // Radius of the earth in km
@@ -107,21 +101,3 @@ function distance(lat1, lon1, lat2, lon2) {
 function deg2rad(deg) {
   return deg * (Math.PI/180)
 }
-
-io.set('log level', 1);
-
-// app.get('/', function(req, res) {
-//   for (var i=0, len=locations.length; i < len; i++) {
-//     //console.log(locations[i]['name']);
-//   }
-// 	res.render('index', { 
-//     title: 'NYPL Libraries', 
-//     location: locations_filter
-// 	});
-// });
-app.get('/', function(req, res) {
-  res.render('index', {
-    title: 'NYPL Libraries',  
-    location: locations_filter
-  });
-});

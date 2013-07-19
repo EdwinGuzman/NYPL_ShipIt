@@ -2,32 +2,431 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<meta name="author" content="Dmitri Voronianski">
-	<title>Real-Time Geolocation Service with Node.js</title>
+	<title>The New York Public Library</title>
+	<link rel="icon" type="image/png" href="/assets/favicon.ico">
 	<link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="./css/styles.css">
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4/leaflet.css" />
+	<link rel="stylesheet" href="./css/MarkerCluster.css">
+	<link rel="stylesheet" href="./css/MarkerCluster.Default.css">
+
+	<link rel="stylesheet" href="/css/main2.css">
+  <link rel="stylesheet" type="text/css" href="/css/icomoon_style.css"> 
+  <link rel="stylesheet" type="text/css" href="/css/styleshome.css">
+  <link rel="stylesheet" type="text/css" href="/css/CNfarm_main.css">
 
 	<!--[if lt IE 9]>
 		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-</head>
-<body>
-	<div class="wrapper">
-	  <header>
-	  	<h1>NYPL Locations Near You</h1>
-	  	<div class="description">Using the HTML5 Geolocation API and Web Sockets to show the locations of visitors in real-time.</div>
-	  </header>
+		<![endif]-->
+	</head>
+	<body>
+		<div id="page">
+			<div id="header">
+				<div class="container_16 tophdr-wrapper">
 
-	  <div class="app">
-	  	<div id="infobox" class="infobox"></div>
-	  	<div id="map">To get this app to work you need to share your geolocation.</div>
-	  </div>
-	</div>
+					<!-- login form -->
+					<div class="login-form">
+						<form action="https://nypl.bibliocommons.com/user/login?destination=http://dev.new.nypl.org#loggedin" method="post">
+							<label for="username">Username or bar code</label>
+							<input id="username" name="name" type="text">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-	<script src="./js/lib/leaflet.js"></script>
-	<script src="/socket.io/socket.io.js"></script>
-	<script src="./js/application.js"></script>
-</body>
-</html>
+							<label for="pin">PIN</label>
+							<input id="pin" name="user_pin" type="password">
+
+							<input name="destination" type="hidden" value="http://dev.new.nypl.org#loggedin">
+
+							<input type="submit" name="commit" id="login-form-submit" title="Log in" value="Log in">
+
+							<div id="login-form-help" class="login-helptext">
+								<a href="https://nypl.bibliocommons.com/user/forgot" class="forgotpin-button">Forgot your PIN?</a>
+								<a href="http://www.nypl.org/help/library-card" class="createacct-button">Need an account?</a>
+							</div>
+
+						</form>
+					</div>
+					<div id="header1"><!-- LOGIN, HELP ETC, LANGS -->
+						<div class="header-buttons">
+							<div id="account-login"><a class="login-button" title="Log in">Log in</a></div>
+							<a href="" class="donate-button">Donate</a>
+						</div>
+
+					</div>
+
+					<div id="header2">
+						<a href="/" id="site-id" title="Go to the home page"><span class="site-name">The New York Public Library</span></a>
+						<a href="/" class="logo grid_8">
+							The New York Public Library
+						</a>
+
+						<div class="collapsed-buttons">
+							<div class="button search-open-button icon-search"></div>
+							<div class="button nav-open-button icon-menu"></div>
+						</div>
+
+						<div id="search-top">
+							<form action="/" accept-charset="UTF-*" method="post" id="search-block-form">
+								<div><!-- SEARCH BOX -->
+									<select class="hideMe" id="t" name="t" style="visibility: visible;">
+										<option title="Keyword" value="smart">Keyword</option>
+										<option title="Title" value="title">Title</option>
+										<option title="Author" value="author">Author</option>
+										<option title="Subject" value="subject">Subject</option>
+										<option title="Tag" value="tag">Tag</option>
+										<option title="List" value="userlist">List</option>
+										<option title="User" value="user">User</option>
+									</select>           
+
+									<input id="search_category" name="search_category" type="hidden" value="keyword">       
+
+									<input class="form-text" maxlength="128" id="search-block-form-input" name="search_block_form" type="text" style="color: rgb(153, 153, 153);" placeholder="Find books, music, movies, and more">
+									<input alt="Search" class="search_button" name="commit" title="Search" type="submit" value="Search">
+
+									<div class="searchOptions">
+										<span>Search:</span>
+										<input checked="checked" class="inline" id="search-zone-catalog" name="search-zone" type="radio" value="catalogue"><label for="search-zone-catalog" class="inline active-option">Catalog</label>
+										<input class="inline" id="search-zone-site" name="search-zone" type="radio" value="website"><label for="search-zone-site" class="inline">NYPL.org</label>
+									</div>
+
+									<div class="searchLinks">
+										<a href="http://catalog.nypl.org/" class="moreSearch">Classic Catalog</a>
+										<a href="http://nypl.bibliocommons.com/search" class="moreSearch">Advanced Search</a>
+									</div>
+									<!-- END SEARCH -->
+
+									<div class="search-options-resp">
+										<div class="catalog-search">catalog</div>
+										<div class="nypl-search">NYPL.org</div>
+									</div>
+								</div>
+
+							</form>
+						</div>
+					</div>
+				</div>
+
+				<div id="header3">
+					<div class="nav-wrapper">
+						<nav id="primary-links" class="container_16">
+							<ul>
+								<li class="first">
+									<a href="/" class="active">
+										<span class="active-border">Home</span>
+									</a>
+								</li>
+
+								<li class="dropDown"><a class="login-button" title="Log in"><span>Log in</span></a></li>
+
+								<li class="dropDown">
+									<a href="http://nypl.bibliocommons.com/dashboard/user_dashboard">
+										<span class="active-border">My NYPL</span>
+									</a>
+									<div class="dropDownContent">
+										<ul>
+											<li>
+												<h5>My Borrowing</h5>
+												<ul>
+													<li>
+														<a href="http://nypl.bibliocommons.com/checkedout" title="">Checked Out</a>
+													</li>
+													<li><a href="http://nypl.bibliocommons.com/holds/index/active" title="">Holds</a></li>
+													<li><a href="http://nypl.bibliocommons.com/fines" title="">Fines</a></li>
+													<li class="last">
+														<a href="http://nypl.bibliocommons.com/accountmessages" title="">Library Messages</a>
+													</li>
+												</ul>
+											</li>
+											<li>
+												<h5>My Shelves</h5>
+												<ul>
+													<li><a href="http://nypl.bibliocommons.com/collection/show/my/library/completed" title="">Completed</a></li>
+													<li><a href="http://nypl.bibliocommons.com/collection/show/my/library/in_progress" title="">In progress</a></li>
+													<li><a href="http://nypl.bibliocommons.com/collection/show/my/library/for_later" title="">For later</a></li>
+													<li class="last"><a href="http://nypl.bibliocommons.com/lists/show/mine" title="">My Lists</a></li>
+												</ul>
+											</li>
+											<li>
+												<h5>My Community</h5>
+												<ul>
+													<li><a href="http://nypl.bibliocommons.com/trustedsources" title="">I'm Following</a></li>
+													<li><a href="http://nypl.bibliocommons.com/ignoredusers" title="">Ignored Users</a></li>
+													<li><a href="http://nypl.bibliocommons.com/recently_shared" title="">Recently Shared</a></li>
+													<li class="last"><a href="http://nypl.bibliocommons.com/messages" title="">Inbox</a></li>
+												</ul>
+											</li>
+										</ul>
+									</div>
+								</li>
+
+								<li class="dropDown">
+									<a href="http://nypl.bibliocommons.com/dashboard"><span class="active-border">Explore</span></a>
+									<div class="dropDownContent">
+										<ul>
+											<li>
+												<h5>New &amp; Notable</h5>
+												<ul>
+													<li><a href="http://nypl.bibliocommons.com/dashboard" title="">Recent Activity</a></li>
+													<li><a href="http://nypl.bibliocommons.com/explore/index/newly_acquired?f_on_order=false" title="">New Titles</a></li>
+													<li><a href="http://nypl.bibliocommons.com/explore/index/awards" title="">Award Winners</a></li>
+													<li><a href="http://nypl.bibliocommons.com/explore/index/best_sellers" title="">Bestsellers</a></li>
+													<li><a href="http://nypl-src-kids.bibliocommons.com/" title="">Kids Summer Reading Club 2012</a></li>
+													<li><a href="http://nypl-src-teens.bibliocommons.com/" title="">Teen Summer Reading 2012</a></li>
+													<li class="last"><a href="http://nypl-src-adults.bibliocommons.com/" title="">Adult Summer Reading 2012</a></li>
+												</ul>
+											</li>
+											<li>
+												<h5>Collections</h5>
+												<ul>
+													<li><a href="http://nypl.bibliocommons.com/search?q=books&amp;t=smart&amp;search_category=keyword&amp;title=Books" title="">Books</a></li>
+													<li><a href="/ebooks" title="">E-books &amp; Audiobooks</a></li>
+													<li><a href="http://nypl.bibliocommons.com/search?q=movies&amp;t=smart&amp;search_category=keyword&amp;title=Movies" title="">Movies</a></li>
+													<li><a href="http://nypl.bibliocommons.com/search?t=smart&amp;search_category=keyword&amp;q=music&amp;commit=Search&amp;searchOpt=catalogue&amp;title=Music+and+R" title="">Music &amp; Recordings</a></li>
+													<li><a href="http://nypl.bibliocommons.com/search?t=smart&amp;search_category=keyword&amp;q=periodicals&amp;commit=Search&amp;searchOpt=catalogue" title="">Periodicals</a></li>
+													<li><a href="http://digitalgallery.nypl.org/" title="">Images</a></li>
+													<li class="last"><a href="/collections/nypl-collections/braille-talking-books" title="">Braille &amp; Talking Books</a></li>
+												</ul>
+											</li>
+											<li>
+												<h5>Made at NYPL</h5>
+												<ul>
+													<li><a href="/blog" title="">Blogs</a></li>
+													<li><a href="/voices/audio-video" title="">Audio &amp; Video</a></li>
+													<li class="last"><a href="/voices/print-publications" title="">Print Publications</a></li>
+												</ul>
+											</li>
+										</ul>
+									</div>
+								</li>
+
+								<li class="dropDown">
+									<a href="/collections"><span class="active-border">Research</span></a>
+									<div class="dropDownContent">
+										<ul>
+											<li>
+												<h5>Electronic Resources</h5>
+												<ul>
+													<li><a href="/collections/articles-databases" title="">Articles and Databases</a></li>
+													<li><a href="/events/online-exhibitions" title="">Online Exhibitions</a></li>
+													<li><a href="http://digitalgallery.nypl.org/" title="">Digital Gallery</a></li>
+													<li><a href="/collections/labs" title="">NYPL Labs</a></li>
+													<li class="last"><a href="/online_projects" title="Digital Projects">Digital Projects</a></li>        
+												</ul>
+											</li>
+											<li>
+												<h5>Tools and Services</h5>
+												<ul>
+													<li><a href="http://catalog.nypl.org/" title="">Classic Catalog</a></li>
+													<li><a href="/collections/nypl-recommendations/guides" title="">Research Guides</a></li>
+													<li><a href="/specialindexes" title="">Indexes to NYPL Collections</a></li>
+													<li><a href="/ask-nypl/research-questions-reproductions" title="">Get Copies</a></li>
+													<li class="last"><a href="/collections/nypl-recommendations" title="">NYPL Recommendations</a></li>
+												</ul>
+											</li>
+											<li>
+												<h5>Collections</h5>
+												<ul>
+													<li><a href="/research-collections" title="">Research Collections</a></li>
+													<li><a href="/find-archival-materials" title="">Manuscripts and Archives</a></li>
+													<li><a href="http://wallachprintsandphotos.nypl.org/" title="">Prints &amp; Photos Online Catalog</a></li>
+													<li class="last"><a href="/collections/nypl-collections/preservation-division" title="">Preservation of NYPL Collections</a></li>
+												</ul>
+											</li>
+										</ul>
+									</div>
+								</li>
+
+								<li class="dropDown">
+									<a href="/help"><span class="active-border">Using the Library</span></a>
+									<div class="dropDownContent">
+										<ul>
+											<li>
+												<h5>Get Oriented</h5>
+												<ul>
+													<li><a href="/help/library-card" title="">Get a Library Card</a></li>
+													<li><a href="/help/borrowing-materials" title="">Borrowing</a></li>
+													<li><a href="/help/finding-things" title="">How To Find Things</a></li>
+													<li><a href="/help/computers-internet-and-wireless-access" title="">Computers</a></li>
+													<li><a href="/help/community-outreach/services-for-persons-with-disabilities" title="">Accessibility</a></li>
+													<li><a href="/help/about-nypl" title="">About the NYPL</a></li>
+													<li class="last"><a href="/voices/connect-nypl" title="">Connect with NYPL</a></li>
+												</ul>
+											</li>
+											<li>
+												<h5>Services</h5>
+												<ul>
+													<li><a href="http://nypl.org/ask-nypl" title="">AskNYPL</a></li>
+													<li><a href="/help/computers-internet-and-wireless-access/reserving-computer" title="">Reserve a PC</a></li>
+													<li><a href="/help/community-outreach" title="">Community Outreach</a></li>
+													<li><a href="/ask-nypl/research-questions-reproductions" title="">Get Copies</a></li>
+													<li><a href="/help/research-services/interlibrary-loan" title="Interlibrary Loan">Interlibrary Loan</a></li>
+													<li><a href="/spacerental" title="">Space Rental</a></li>
+													<li class="last"><a href="http://shop.nypl.org/" title="">The Library Shop</a></li>
+												</ul>
+											</li>
+											<li>
+												<h5>I am a...</h5>
+												<ul>
+													<li><a href="/events/teaching-learning" title="">Teacher</a></li>
+													<li><a href="/help/getting-oriented/for-job-seekers" title="">Job Seeker</a></li>
+													<li><a href="http://smallbiz.nypl.org/" title="">Small Business Owner</a></li>
+													<li><a href="/help/getting-oriented/resources-kids" title="">Child</a></li>
+													<li><a href="/help/getting-oriented/resources-teens" title="">Teen</a></li>
+													<li><a href="/help/community-outreach/services-for-persons-with-disabilities" title="">Person with a Disability</a></li>
+													<li><a href="/help/community-outreach/immigrant-services" title="">Recent Immigrant</a></li>
+													<li class="last"><a href="http://nypl.org/support" title="">NYPL Donor</a></li>
+												</ul>
+											</li>
+										</ul>
+									</div>
+								</li>
+
+								<li class="dropDown">
+									<a href="/locations"><span class="active-border">Locations</span></a>
+									<div class="dropDownContent oneLevel">
+										<ul>
+											<li><a href="/locations#manhattan-list" title="">Manhattan</a></li>
+											<li><a href="/locations#bronx-list" title="">The Bronx</a></li>
+											<li><a href="/locations#statenisland-list" title="">Staten Island</a></li>
+											<li><a href="/locations#research-list" title="">Research Libraries</a></li>
+											<li class="last">
+												<a href="/help/getting-oriented/brooklyn-queens-libraries" title="Brooklyn and Queens Libraries">Brooklyn &amp; Queens</a>
+											</li>
+										</ul>
+									</div>
+								</li>
+
+								<li class="dropDown">
+									<a href="/events"><span class="active-border">Classes &amp; Events</span></a>
+									<div class="dropDownContent oneLevel">
+										<ul>
+											<li>
+												<a href="/events/exhibitions" title="">Current Exhibitions</a>
+											</li>
+											<li>
+												<a href="/events/public-programs" title="">Programs</a>
+											</li>
+											<li>
+												<a href="/events/classes" title="">Classes</a>
+											</li>
+											<li>
+												<a href="/events/classes/adult-learning-centers" title="">Learn English</a>
+											</li>
+											<li>
+												<a href="/events/tours" title="">Tours</a>
+											</li>
+											<li>
+												<a href="/events/exhibitions-past" title="">Past Exhibitions</a>
+											</li>
+											<li class="last">
+												<a href="/events/live-nypl" title="">LIVE from the NYPL</a>
+											</li>
+										</ul>
+									</div>
+								</li>
+
+								<li class="dropDown">
+									<a href="/support"><span class="active-border">Support the Library</span></a>
+									<div class="dropDownContent oneLevel">
+										<ul>
+											<li><a href="http://nypl.org/donate" title="">Donate</a></li>
+											<li><a href="/support/membership" title="">Membership</a></li>
+											<li><a href="/help/about-nypl/volunteer-nypl" title="">Volunteer</a></li>
+											<li><a href="http://www.nypl.org/honorandmemorial" title="Honor and Memorial Gifts">Honor and Memorial Gifts</a></li>
+											<li><a href="/support/benefit-events" title="">Benefit Events</a></li>
+											<li><a href="/support/planned-giving" title="">Planned Giving</a></li>
+											<li><a href="http://shop.nypl.org/" title="">Shop</a></li>
+											<li class="last"><a href="/support/donate" title="">More Ways to Give</a></li>
+										</ul>
+									</div>
+								</li>
+
+								<li class="last">
+									<a href="/ask-nypl">
+										<span class="active-border">Help</span>
+									</a>
+								</li>                        
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div> <!-- END OF #HEADER -->
+
+			<ul id="wrapper">
+				<li id="bighighlight" class="brick brick-two-thirds">
+					<header>
+						<h1>NYPL Locations near you</h1>
+					</header>
+
+					<div class="app">
+						<div id="infobox" class="infobox"></div>
+						<div id="map">To get this app to work you need to share your geolocation.</div>
+					</div>
+
+					<input type="text" name="miles" placeholder="Distance in miles" id="miles"/>
+					<input type="button" name="submit" value="Submit" id="submit_miles"/>
+						<div id="library_directions"></div>
+						<div id="library_events"></div>
+				</li>
+			</ul>
+
+
+			<footer>
+            
+                <ul class="socialmedia">
+                    <li id="facebook"><a class="icon-facebook" onclick="javascript:_gaq.push(['_trackPageview', '/goal/facebook/deep-footer/image']);" href="http://www.facebook.com/newyorkpubliclibrary"><span class="replaced-text">Facebook</span></a></li>
+                    <li id="twitter"><a class="icon-twitter" onclick="javascript:_gaq.push(['_trackPageview', '/goal/twitter/deep-footer/image']);" href="http://twitter.com/nypl"><span class="replaced-text">Twitter</span></a></li>
+                    <li id="tumblr"><a class="icon-tumblr" onclick="javascript:_gaq.push(['_trackPageview', '/goal/tumblr/deep-footer/image']);" href="http://nypl.tumblr.com/"><span class="replaced-text">Tumblr</span></a></li>
+                    <li id="pinterest"><a class="icon-pinterest" href="http://pinterest.com/nypl" onclick="javascript:_gaq.push(['_trackPageview', '/goal/pinterest/deep-footer/image']);" class="ext"><span class="replaced-text">Pinterest</span></a></li>
+                </ul>
+                
+                </ul>
+                
+                
+                <div class="footerlinks">
+                    <ul>
+                    <li class="footer1"><a href="/help/about-nypl">About NYPL</a></li>
+                    <li><a href="/help/about-nypl/leadership/marx">President's Office</a></li>
+                    <li><a href="/help/computers-internet-and-wireless-access/reserving-computer">Reserve a PC</a></li>
+                    <li><a href="/spacerental">Space Rental</a></li>
+                    <li><a href="/help/about-nypl/careers-nypl">Careers at NYPL</a></li>
+                    <li><a href="/help/getting-oriented/resources-teachers">Resources for Teachers</a></li>
+                    <li><a href="http://shop.nypl.org/">The Library Shop</a></li>
+                    </ul>
+                    
+                    <ul>
+                    <li class="footer1"><a href="http://www.nypl.org/eNews">E-Newsletters</a></li>
+                    <li><a href="/help/about-nypl/media-center">Media Center</a></li>
+                    <li><a href="/voices/connect-nypl">Connect with NYPL</a></li>
+                    <li><a href="/mobile-help">Mobile Apps</a></li>
+                    </ul>
+                    
+                    <ul>
+                    <li class="footer1"><a href="/help/about-nypl/legal-notices/privacy-policy">Privacy Policy</a></li>
+                    <li><a href="/help/about-nypl/legal-notices/rules-and-regulations">Rules and Regulations</a></li>
+                    <li><a href="/help/computers-internet-and-wireless-access/a-safety-net-for-the-internet">Using the Internet</a></li>
+                    <li><a href="/help/about-nypl/legal-notices/website-terms-and-conditions">Website Terms and Conditions</a></li>
+                    <li><a href="/help/about-nypl/legal-notices/policy-gifts-materials">Gifts of Materials to NYPL</a></li>
+                    </ul>
+                    
+                    <ul class="last">
+                    <li class="footer1"><a href="/node/57438">Español</a></li>
+                    <li class="footer1"><a href="/node/107747">中文</a></li>
+                    <li class="footer1"><a href="/node/107749">русский</a></li>
+                    </ul>
+                </div>
+                
+                
+
+                 
+                <div class="copyright">
+                    <p>© The New York Public Library, 2013</p>
+                </div>
+            </footer>
+		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+		<script src="./js/lib/leaflet.js"></script>
+		<script src="./js/lib/leaflet.markercluster.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="./js/application.js"></script>
+		<script src="./js/main.js"></script>
+	</body>
+	</html>

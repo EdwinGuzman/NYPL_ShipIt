@@ -1,0 +1,67 @@
+/****************/
+/* Global Fonts */
+/****************/
+html {
+    font-size: 62.5%;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    color: #383431;
+}
+
+h2 {
+    font-size: 24px;
+    font-size: 2.4rem;
+    font-weight: bold;
+    margin: 35px 0 25px 0;
+}
+
+h3 {
+    font-size: 20px;
+    font-size: 2.0rem;
+}
+
+a {
+
+/*     font-weight: bold; */
+/*    font-size: 16px;
+    font-size: 1.6rem;
+    color: #146998;
+*/
+    text-decoration: none;
+}
+
+p {
+    font-size: 14px;
+    font-size: 1.4rem;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/*
+a.button {
+    background: #146998;
+    color: #ffffff;
+    padding: 7px 8px;
+}
+*/
+
+select:focus {
+    outline: none;
+}
+
+.hidden {
+    position: absolute;
+    left: 999999px;
+}
+
+
+/*****************/
+/* Page sections */
+/*****************/
+/* #main-home */ .page-section {
+    width: 100%;
+}
+
+
+
